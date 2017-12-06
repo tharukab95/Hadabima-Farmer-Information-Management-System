@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+    html { height: 100% }
+    body { height: 100%; margin: 0; padding: 0 }
+    .wrap { max-width: 75em; min-height: 40em; height:100%; width:100%; margin: 0 auto; padding-top: 2.5%;}
+    #map-canvas { height: 90%; }
+    </style>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBkQodUnFgdXAuiSxGgM72dZBkZN884d0Y&sensor=false"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="text/javascript">
+        var map;
+        var centerPos = new google.maps.LatLng(7.122969, 80.548961);
+        var zoomLevel = 8;
+        function initialize() {
+          var mapOptions = {
+            center: centerPos,
+            zoom: zoomLevel
+          };
+          map = new google.maps.Map( document.getElementById("map-canvas"), mapOptions )
+
+          updateLocations();
+        }
+
+        function updateLocations() {
+          axios.get('/hadabima%20system/production/service.php')
+            .then(function (response) {
+              render(response.data);
+            })
+            .catch(function (error) {
+              alert('Something went wrong');
+            });
+        }
+
+        setInterval(updateLocations, 1000);
+
+        function render(locations) {
+            locations.forEach(location => {
+              marker = new google.maps.Marker({
+                position: new google.maps.LatLng(location.latitude, location.longitude),
+                title: location.GN_name,
+                map: map
+              });
+            });  
+        }
+        
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div class="wrap">
+      <div id="map-canvas"></div>
+    </div>
+  </body>
+</html>
